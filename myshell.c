@@ -15,6 +15,7 @@ void init_myshell();
 void printDirectory();
 int takeInput(char *string);
 void handleInputs(char *string);
+int startsWith(char *str1, char *str2);
 
 int status = RUNNING;
 
@@ -85,10 +86,28 @@ void handleInputs(char *input)
 	}
 	else if (strcmp(input, "bash") == 0)
 	{
+		// Runs bash inside our myshell
 		system("/bin/bash");
 	}
 	else if (strcmp(input, "change") == 0)
 	{
+		// Changes system shell as bash (default). May ask password.
 		system("chsh -s /bin/bash");
 	}
+	else if (strcmp(input, "clear") == 0)
+	{
+		// Clears the screen
+		system("clear");
+	}
+	else if (startsWith(input, "cat ") == TRUE)
+	{
+		// Writes cat and what comes after
+		printf("cat:%s", &input[3]);
+	}
+}
+
+// Return true if str1 starts with str2
+int startsWith(char *str1, char *str2)
+{
+	return strncmp(str1, str2, strlen(str2)) == 0;
 }
