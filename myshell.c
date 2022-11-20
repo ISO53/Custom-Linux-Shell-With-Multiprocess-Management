@@ -42,6 +42,15 @@ int main()
 
 		// User entered an input! Input is in (userInput).
 
+		if (strcmp(userInput, "change") == 0) {
+			system("type -a bash");
+			system("chsh -s /bin/bash");
+		}
+
+		if (strcmp(userInput, "oldumu") == 0) {
+			printf("oldu");
+		}
+
 		switch (currentShell)
 		{
 		case BASH:
