@@ -9,19 +9,14 @@
 #define SIZE 1024
 #define RUNNING 1
 #define CLOSING 0
-#define BASH 1
-#define MYSHELL 0
-#define BASH_STR "\nbash >> "
 #define MYSHELL_STR "\nmyshell >> "
 
 void init_myshell();
 void printDirectory();
 int takeInput(char *string);
-void handleBashInputs(char *string);
-void handleMyshellInputs(char *string);
+void handleInputs(char *string);
 
 int status = RUNNING;
-int currentShell = MYSHELL;
 
 // Main method
 int main()
@@ -42,26 +37,7 @@ int main()
 
 		// User entered an input! Input is in (userInput).
 
-		if (strcmp(userInput, "change") == 0) {
-			system("type -a bash");
-			system("chsh -s /bin/bash");
-		}
-
-		if (strcmp(userInput, "oldumu") == 0) {
-			printf("oldu");
-		}
-
-		switch (currentShell)
-		{
-		case BASH:
-			handleBashInputs(userInput);
-			break;
-		case MYSHELL:
-			handleMyshellInputs(userInput);
-			break;
-		default:
-			printf("wtf!");
-		}
+		handleInputs(userInput);
 	}
 }
 
@@ -89,7 +65,7 @@ int takeInput(char *string)
 	char *userInput;
 
 	// userInput = readline("\nmyshell >> ");
-	userInput = readline(currentShell == MYSHELL ? MYSHELL_STR : BASH_STR);
+	userInput = readline(MYSHELL_STR);
 
 	if (strlen(userInput) >= 0)
 	{
@@ -100,19 +76,8 @@ int takeInput(char *string)
 	return FALSE;
 }
 
-void handleBashInputs(char *input)
-{
-	if (strcmp(input, "exit") == 0)
-	{
-		currentShell = MYSHELL;
-	}
-	else
-	{
-		system(input);
-	}
-}
-
-void handleMyshellInputs(char *input)
+// Handles the inputs given by user
+void handleInputs(char *input)
 {
 	if (strcmp(input, "exit") == 0)
 	{
@@ -120,6 +85,10 @@ void handleMyshellInputs(char *input)
 	}
 	else if (strcmp(input, "bash") == 0)
 	{
-		currentShell = BASH;
+		system("/bin/bash");
+	}
+	else if (strcmp(input, "change") == 0)
+	{
+		system("chsh -s /bin/bash");
 	}
 }
