@@ -6,6 +6,7 @@
 
 void getSystemTime(char *timeStr);
 
+// Main method
 int main(int argc, char **argv)
 {
 

@@ -43,6 +43,8 @@ int main()
 
 		handleInputs(userInput);
 	}
+
+	return EXIT_SUCCESS;
 }
 
 // Initializes myshell program
