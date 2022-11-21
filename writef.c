@@ -11,13 +11,13 @@ int main(int argc, char **argv)
 
     if (argc < 3)
     {
-        printf("Too few arguments in function call! Try 'help writef'.\n");
+        printf("Too few arguments in function call!n");
         exit(EXIT_FAILURE);
     }
 
     if (argc > 3)
     {
-        printf("Too many arguments in function call! Try 'help writef'.\n");
+        printf("Too many arguments in function call!\n");
         exit(EXIT_FAILURE);
     }
 

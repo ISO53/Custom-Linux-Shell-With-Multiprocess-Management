@@ -18,6 +18,7 @@ int takeInput(char *string);
 void handleInputs(char *string);
 int startsWith(char *str1, char *str2);
 void printFilesInDir();
+void printHelp(char *input);
 
 int status = RUNNING;
 
@@ -110,6 +111,17 @@ void handleInputs(char *input)
 	{
 		printFilesInDir();
 	}
+	else if (startsWith(input, "help") == TRUE)
+	{
+		printHelp(input);
+	}
+	else if (startsWith(input, "execx ") == TRUE)
+	{
+	}
+	else
+	{
+		printf("Incorrect command! Please type help for additional information.\n");
+	}
 }
 
 // Return true if str1 starts with str2
@@ -118,6 +130,7 @@ int startsWith(char *str1, char *str2)
 	return strncmp(str1, str2, strlen(str2)) == 0;
 }
 
+// Prints files and dirs in the current directory except . and ..
 void printFilesInDir()
 {
 	DIR *d;
@@ -130,13 +143,59 @@ void printFilesInDir()
 	{
 		while ((dir = readdir(d)) != NULL)
 		{
-			if ((strcmp(dir->d_name, ".") != 0) && (strcmp(dir->d_name, "..") != 0)) {
+			if ((strcmp(dir->d_name, ".") != 0) && (strcmp(dir->d_name, "..") != 0))
+			{
 				printf("%s ", dir->d_name);
 			}
 		}
 		closedir(d);
-	} else {
+	}
+	else
+	{
 		printf("Problem occured while opening dir '%s'.", dirStr);
+	}
+}
+
+// Prints help informations
+void printHelp(char *input)
+{
+	if (strcmp(input, "help") == 0)
+	{
+		printf("Available commands are:\nbash, cat, change, clear, execx, exit, help, ls\nPlease type 'help commandName' for additional information.\n");
+	}
+	else if (strcmp(input, "help bash") == 0)
+	{
+		printf("Opens the bash shell to use bash commands.\n");
+	}
+	else if (strcmp(input, "help cat") == 0)
+	{
+		printf("Prints the input to the screen.\n");
+	}
+	else if (strcmp(input, "help change") == 0)
+	{
+		printf("Added for emergencies. Changes system shell to /bin/bash. The system must be restarted for the change to take effect.\n");
+	}
+	else if (strcmp(input, "help clear") == 0)
+	{
+		printf("Clear the terminal.\n");
+	}
+	else if (strcmp(input, "help execx") == 0)
+	{
+		printf("Executes the given process certain times. The exact syntax is:\nexecx -t {n} {name} {[parameters]}\n");
+		printf("Here the n is how many times the process should be executed.\n");
+		printf("The name should be the name of the process and the parameters will used as parameters of called process.\n");
+	}
+	else if (strcmp(input, "help exit") == 0)
+	{
+		printf("Exits shell.\n");
+	}
+	else if (strcmp(input, "help help") == 0)
+	{
+		printf("Shows the available commands and what they do.\n");
+	}
+	else if (strcmp(input, "help ls") == 0)
+	{
+		printf("Prints the directories and files under the current directory except '.' and '..'.\n");
 	}
 }
 
