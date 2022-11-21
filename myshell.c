@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <dirent.h>
 #include <readline/readline.h>
 
 #define FALSE 0
@@ -12,10 +13,11 @@
 #define MYSHELL_STR "\nmyshell >> "
 
 void init_myshell();
-void printDirectory();
+void getDirectory(char *dir);
 int takeInput(char *string);
 void handleInputs(char *string);
 int startsWith(char *str1, char *str2);
+void printFilesInDir();
 
 int status = RUNNING;
 
@@ -52,12 +54,12 @@ void init_myshell()
 	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 }
 
-// Prints current directory
-void printDirectory()
+// Returns current directory
+void getDirectory(char *dir)
 {
 	char directory[SIZE];
 	getcwd(directory, sizeof(directory));
-	printf("%s", directory);
+	strcpy(dir, directory);
 }
 
 // Reads line from stdin (terminal)
@@ -104,6 +106,10 @@ void handleInputs(char *input)
 		// Writes cat and what comes after
 		printf("cat:%s", &input[3]);
 	}
+	else if (strcmp(input, "ls") == 0)
+	{
+		printFilesInDir();
+	}
 }
 
 // Return true if str1 starts with str2
@@ -111,3 +117,26 @@ int startsWith(char *str1, char *str2)
 {
 	return strncmp(str1, str2, strlen(str2)) == 0;
 }
+
+void printFilesInDir()
+{
+	DIR *d;
+	struct dirent *dir;
+	char dirStr[1024];
+	getDirectory(dirStr);
+	d = opendir(dirStr);
+
+	if (d)
+	{
+		while ((dir = readdir(d)) != NULL)
+		{
+			if ((strcmp(dir->d_name, ".") != 0) && (strcmp(dir->d_name, "..") != 0)) {
+				printf("%s ", dir->d_name);
+			}
+		}
+		closedir(d);
+	} else {
+		printf("Problem occured while opening dir '%s'.", dirStr);
+	}
+}
+

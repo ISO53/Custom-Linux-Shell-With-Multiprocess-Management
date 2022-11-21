@@ -38,7 +38,10 @@ int main(int argc, char **argv)
         char timeStr[128];
         getSystemTime(timeStr);
         snprintf(message, sizeof(message), "time:%s | pid:%d | ppid:%d\n", timeStr, getpid(), getppid());
-        fputs(message, fp);
+        if (fputs(message, fp) == EOF) {
+            printf("Failed to write file '%s'! Aborting process.\n", fileName);
+            exit(EXIT_FAILURE);
+        }
 
         char directory[1024];
         getcwd(directory, sizeof(directory));
@@ -52,7 +55,7 @@ int main(int argc, char **argv)
     }
 }
 
-// Return current date and time as string format
+// Returns current date and time as string format
 void getSystemTime(char *timeStr)
 {
     time_t raw_time;
