@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <sys/wait.h>
 #include <readline/readline.h>
 
 #define FALSE 0
@@ -121,51 +122,25 @@ void handleInputs(char *input)
 	}
 	else if (startsWith(input, "execx ") == TRUE)
 	{
-		// [0] = execx, [1] = -t, [2] = n, [3] = processName, [4] = -f, [5] = fileName
 		char *tokens[TOKENS_SIZE];
-		int numberOfToken = tokenizeInput(input, tokens, TOKENS_SIZE);
+		tokenizeInput(input, tokens, TOKENS_SIZE);
 
-		if (numberOfToken != TOKENS_SIZE)
-		{
-			printf("Too few arguments in function call! For additional information try 'help execx'.\n");
+		int process;
+
+		pid_t pid;
+		if ((pid = fork()) == 0)
+		{ // Child process
+
+			// [0] = execx, [1] = -t, [2] = n, [3] = processName, [4] = -f, [5] = fileName
+			char *data[7] = {tokens[0], tokens[1], tokens[2], tokens[3], tokens[4], tokens[5], NULL};
+			process = execv("execx", data);
+
+			perror("Error occured during progress! Aborting process.\n");
 			return;
 		}
-
-		if (strcmp(tokens[1], "-t") != 0)
-		{
-			printf("The function execx has no argument as '%s'!. Did you mean '-t'?\n", tokens[1]);
-			return;
-		}
-
-		int number = atoi(tokens[2]);
-		if (number == 0 || number == -1)
-		{
-			printf("Third parameter should be a positive integer! For additional information try 'help execx'.\n");
-			return;
-		}
-
-		if (strcmp(tokens[4], "-f") != 0)
-		{
-			printf("The function writef has no argument as '%s'!. Did you mean '-f'?\n", tokens[4]);
-			return;
-		}
-
-		// Call the process number of times given by the user
-		for (int i = 0; i < number; i++)
-		{
-			int process;
-
-			pid_t pid;
-			if ((pid = fork()) == 0) { // Child process
-				
-				char *data[4] = {strcat("./", tokens[3]), tokens[4], tokens[5], NULL};
-				process = execv("writef", data);
-
-				perror("Error occured during progress! Aborting process.\n");
-				return;
-			} else { // Parent process
-				wait(&process);
-			}
+		else
+		{ // Parent process
+			wait(&process);
 		}
 	}
 	else
