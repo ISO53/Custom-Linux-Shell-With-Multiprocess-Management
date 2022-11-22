@@ -5,14 +5,14 @@
 #include <unistd.h>
 
 void getSystemTime(char *timeStr);
+void writeToFile(char *fileName);
 
 // Main method
 int main(int argc, char **argv)
 {
-
     if (argc < 3)
     {
-        printf("Too few arguments in function call!n");
+        printf("Too few arguments in function call!\n");
         exit(EXIT_FAILURE);
     }
 
@@ -32,6 +32,25 @@ int main(int argc, char **argv)
 
     char *fileName = argv[2];
 
+    writeToFile(argv[2]);
+}
+
+// Returns current date and time as string format
+void getSystemTime(char *timeStr)
+{
+    time_t raw_time;
+    struct tm *timeinfo;
+    time(&raw_time);
+    timeinfo = localtime(&raw_time);
+    strcpy(timeStr, asctime(timeinfo));
+    timeStr[strlen(timeStr) - 1] = '\0';
+}
+
+/* Writes or appends processes pid and ppid values and current time
+ * into file with a given name.
+ */
+void writeToFile(char *fileName)
+{
     FILE *fp = fopen(strcat(fileName, ".txt"), "a+");
     if (fp)
     {
@@ -39,7 +58,8 @@ int main(int argc, char **argv)
         char timeStr[128];
         getSystemTime(timeStr);
         snprintf(message, sizeof(message), "time:%s | pid:%d | ppid:%d\n", timeStr, getpid(), getppid());
-        if (fputs(message, fp) == EOF) {
+        if (fputs(message, fp) == EOF)
+        {
             printf("Failed to write file '%s'! Aborting process.\n", fileName);
             exit(EXIT_FAILURE);
         }
@@ -55,15 +75,3 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 }
-
-// Returns current date and time as string format
-void getSystemTime(char *timeStr)
-{
-    time_t raw_time;
-    struct tm *timeinfo;
-    time(&raw_time);
-    timeinfo = localtime(&raw_time);
-    strcpy(timeStr, asctime(timeinfo));
-    timeStr[strlen(timeStr) - 1] = '\0';
-}
-

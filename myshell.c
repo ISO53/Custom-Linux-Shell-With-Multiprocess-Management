@@ -11,6 +11,7 @@
 #define RUNNING 1
 #define CLOSING 0
 #define MYSHELL_STR "\nmyshell >> "
+#define TOKENS_SIZE 6
 
 void init_myshell();
 void getDirectory(char *dir);
@@ -19,6 +20,7 @@ void handleInputs(char *string);
 int startsWith(char *str1, char *str2);
 void printFilesInDir();
 void printHelp(char *input);
+int tokenizeInput(char *input, char **tokens, int length);
 
 int status = RUNNING;
 
@@ -119,10 +121,57 @@ void handleInputs(char *input)
 	}
 	else if (startsWith(input, "execx ") == TRUE)
 	{
+		// [0] = execx, [1] = -t, [2] = n, [3] = processName, [4] = -f, [5] = fileName
+		char *tokens[TOKENS_SIZE];
+		int numberOfToken = tokenizeInput(input, tokens, TOKENS_SIZE);
+
+		if (numberOfToken != TOKENS_SIZE)
+		{
+			printf("Too few arguments in function call! For additional information try 'help execx'.\n");
+			return;
+		}
+
+		if (strcmp(tokens[1], "-t") != 0)
+		{
+			printf("The function execx has no argument as '%s'!. Did you mean '-t'?\n", tokens[1]);
+			return;
+		}
+
+		int number = atoi(tokens[2]);
+		if (number == 0 || number == -1)
+		{
+			printf("Third parameter should be a positive integer! For additional information try 'help execx'.\n");
+			return;
+		}
+
+		if (strcmp(tokens[4], "-f") != 0)
+		{
+			printf("The function writef has no argument as '%s'!. Did you mean '-f'?\n", tokens[4]);
+			return;
+		}
+
+		// Call the process number of times given by the user
+		for (int i = 0; i < number; i++)
+		{
+			int process;
+
+			pid_t pid;
+			if ((pid = fork()) == 0) { // Child process
+				
+				char *data[4] = {strcat("./", tokens[3]), tokens[4], tokens[5], NULL};
+				process = execv("writef", data);
+
+				perror("Error occured during progress! Aborting process.\n");
+				return;
+			} else { // Parent process
+				wait(&process);
+			}
+		}
 	}
 	else
 	{
 		printf("Incorrect command! Please type help for additional information.\n");
+		return;
 	}
 }
 
@@ -201,3 +250,20 @@ void printHelp(char *input)
 	}
 }
 
+/* Tokenizes the given input into an array of strings and returns the number
+ * of tokenized elements. If the number doesnt match the length, than there is
+ * less token than the given arrays size.
+ */
+int tokenizeInput(char *input, char **tokens, int length)
+{
+	int counter = 0;
+	char *temp = strtok(input, " ");
+
+	while (temp != NULL && counter < length)
+	{
+		tokens[counter++] = temp;
+		temp = strtok(NULL, " ");
+	}
+
+	return counter;
+}
