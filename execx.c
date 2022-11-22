@@ -6,6 +6,7 @@
 
 #define TOKENS_SIZE 6
 
+// Main method
 int main(int argc, char **argv)
 {
 
