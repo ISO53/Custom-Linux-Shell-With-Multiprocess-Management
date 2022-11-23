@@ -13,6 +13,7 @@
 #define CLOSING 0
 #define MYSHELL_STR "\nmyshell >> "
 #define TOKENS_SIZE 6
+#define clear() printf("\033[H\033[J")
 
 void init_myshell();
 void getDirectory(char *dir);
@@ -73,7 +74,6 @@ int takeInput(char *string)
 {
 	char *userInput;
 
-	// userInput = readline("\nmyshell >> ");
 	userInput = readline(MYSHELL_STR);
 
 	if (strlen(userInput) >= 0)
@@ -105,7 +105,7 @@ void handleInputs(char *input)
 	else if (strcmp(input, "clear") == 0)
 	{
 		// Clears the screen
-		system("clear");
+		clear();
 	}
 	else if (startsWith(input, "cat ") == TRUE)
 	{
@@ -169,6 +169,7 @@ void printFilesInDir()
 	{
 		while ((dir = readdir(d)) != NULL)
 		{
+			// If the directory isn't . or ..
 			if ((strcmp(dir->d_name, ".") != 0) && (strcmp(dir->d_name, "..") != 0))
 			{
 				printf("%s ", dir->d_name);
@@ -203,13 +204,12 @@ void printHelp(char *input)
 	}
 	else if (strcmp(input, "help clear") == 0)
 	{
-		printf("Clear the terminal.\n");
+		printf("Clears the terminal.\n");
 	}
 	else if (strcmp(input, "help execx") == 0)
 	{
 		printf("Executes the given process certain times. The exact syntax is:\nexecx -t {n} {name} {[parameters]}\n");
-		printf("Here the n is how many times the process should be executed.\n");
-		printf("The name should be the name of the process and the parameters will used as parameters of called process.\n");
+		printf("Here the n is how many times the process should be executed. The name should be the name of the process and the parameters will used as parameters of called process.\n");
 	}
 	else if (strcmp(input, "help exit") == 0)
 	{

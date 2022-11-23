@@ -33,6 +33,8 @@ int main(int argc, char **argv)
     char *fileName = argv[2];
 
     writeToFile(argv[2]);
+
+    return EXIT_SUCCESS;
 }
 
 // Returns current date and time as string format
