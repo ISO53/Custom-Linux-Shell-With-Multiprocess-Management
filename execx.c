@@ -4,13 +4,17 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#define TOKENS_SIZE 6
+#define MIN_TOKENS_SIZE 6
+
+void execProcess(int number, char *processName, char **data);
+void printStrArr(int n, char **matrix);
+void copyMatrixFrom(int start, int end, char **arr1, char **arr2);
 
 // Main method
 int main(int argc, char **argv)
 {
 
-    if (argc != TOKENS_SIZE)
+    if (argc < MIN_TOKENS_SIZE)
     {
         printf("Too few arguments in function call! For additional information try 'help execx'.\n");
         return EXIT_FAILURE;
@@ -29,12 +33,27 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    if (strcmp(argv[4], "-f") != 0)
-    {
-        printf("The function writef has no argument as '%s'!. Did you mean '-f'?\n", argv[4]);
+    /* given input is --> [0] = execx, [1] = -t, [2] = n, [3.4.5.6...] = parameters
+     * we should send the parameters, so first 3 string is off the table
+     */
+    int dataSize = argc - 3;
+    char *data[++dataSize]; // +1 is because NULL for last element
+    copyMatrixFrom(3, argc, data, argv);
+    data[dataSize - 1] = NULL;
+
+    if ((strcmp(data[0], "writef") == 0) || (strcmp(data[0], "execx") == 0)) {
+        execProcess(number, data[0], data);
+    } else {
+        printf("There is no program called %s! Aborting process.", data[0]);
         return EXIT_FAILURE;
     }
 
+    return EXIT_SUCCESS;
+}
+
+// Executes a process with a given 'processName', 'number' times with given 'data'
+void execProcess(int number, char *processName, char **data)
+{
     // Call the process number of times given by the user
     for (int i = 0; i < number; i++)
     {
@@ -44,18 +63,32 @@ int main(int argc, char **argv)
         if ((pid = fork()) == 0)
         { // Child process
 
-            // [0] = execx, [1] = -t, [2] = n, [3] = processName, [4] = -f, [5] = fileName
-            char *data[4] = {argv[3], argv[4], argv[5], NULL};
-            process = execv(argv[3], data);
+            process = execv(processName, data);
 
             perror("Error occured during progress! Aborting process.\n");
-            return EXIT_FAILURE;
+            return;
         }
         else
         { // Parent process
             wait(&process);
         }
     }
+}
 
-    return EXIT_SUCCESS;
+// Prints given string arr
+void printStrArr(int n, char **matrix)
+{
+    for (int i = 0; i < n; i++)
+    {
+        printf("%s\n", matrix[i]);
+    }
+}
+
+// Copies arr2's elements to arr1 starting from 'start''th index to 'end''th index.
+void copyMatrixFrom(int start, int end, char **arr1, char **arr2)
+{
+    for (int i = start; i < end; i++)
+    {
+        arr1[i - start] = arr2[i];
+    }
 }
