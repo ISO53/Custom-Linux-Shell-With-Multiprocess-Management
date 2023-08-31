@@ -182,7 +182,11 @@ void printFilesInDir()
 	}
 }
 
-// Prints help informations
+/**
+ * @brief Prints help informations
+ * 
+ * @param input 
+ */
 void printHelp(char *input)
 {
 	if (strcmp(input, "help") == 0)
@@ -225,7 +229,7 @@ void printHelp(char *input)
 	}
 }
 
-/* Tokenizes the given input into an array of strings and returns the number
+/** Tokenizes the given input into an array of strings and returns the number
  * of tokenized elements. If the number doesnt match the length, than there is
  * less token than the given arrays size.
  */
