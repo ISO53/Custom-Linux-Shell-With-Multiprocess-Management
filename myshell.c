@@ -11,8 +11,9 @@
 #define SIZE 1024
 #define RUNNING 1
 #define CLOSING 0
+#define MAX_ARG_SIZE 100
 #define MYSHELL_STR "\nmyshell >> "
-#define TOKENS_SIZE 6
+#define clear() printf("\033[H\033[J")
 
 void init_myshell();
 void getDirectory(char *dir);
@@ -21,7 +22,9 @@ void handleInputs(char *string);
 int startsWith(char *str1, char *str2);
 void printFilesInDir();
 void printHelp(char *input);
-int tokenizeInput(char *input, char **tokens, int length);
+int tokenizeInput(char *input, char **tokens);
+void copyMatrixUntil(int limit, char **arr1, char **arr2);
+void printStrArr(int n, char **matrix);
 
 int status = RUNNING;
 
@@ -73,7 +76,6 @@ int takeInput(char *string)
 {
 	char *userInput;
 
-	// userInput = readline("\nmyshell >> ");
 	userInput = readline(MYSHELL_STR);
 
 	if (strlen(userInput) >= 0)
@@ -105,7 +107,7 @@ void handleInputs(char *input)
 	else if (strcmp(input, "clear") == 0)
 	{
 		// Clears the screen
-		system("clear");
+		clear();
 	}
 	else if (startsWith(input, "cat ") == TRUE)
 	{
@@ -122,18 +124,19 @@ void handleInputs(char *input)
 	}
 	else if (startsWith(input, "execx ") == TRUE)
 	{
-		char *tokens[TOKENS_SIZE];
-		tokenizeInput(input, tokens, TOKENS_SIZE);
+		char *tempTokens[MAX_ARG_SIZE];
+		int tokensSize = tokenizeInput(input, tempTokens);
+		char *tokens[++tokensSize]; // +1 is because NULL for last element
+		copyMatrixUntil(tokensSize - 1, tokens, tempTokens);
+		tokens[tokensSize - 1] = NULL;
 
 		int process;
-
 		pid_t pid;
+
 		if ((pid = fork()) == 0)
 		{ // Child process
 
-			// [0] = execx, [1] = -t, [2] = n, [3] = processName, [4] = -f, [5] = fileName
-			char *data[7] = {tokens[0], tokens[1], tokens[2], tokens[3], tokens[4], tokens[5], NULL};
-			process = execv("execx", data);
+			process = execv("execx", tokens);
 
 			perror("Error occured during progress! Aborting process.\n");
 			return;
@@ -169,6 +172,7 @@ void printFilesInDir()
 	{
 		while ((dir = readdir(d)) != NULL)
 		{
+			// If the directory isn't . or ..
 			if ((strcmp(dir->d_name, ".") != 0) && (strcmp(dir->d_name, "..") != 0))
 			{
 				printf("%s ", dir->d_name);
@@ -207,13 +211,12 @@ void printHelp(char *input)
 	}
 	else if (strcmp(input, "help clear") == 0)
 	{
-		printf("Clear the terminal.\n");
+		printf("Clears the terminal.\n");
 	}
 	else if (strcmp(input, "help execx") == 0)
 	{
 		printf("Executes the given process certain times. The exact syntax is:\nexecx -t {n} {name} {[parameters]}\n");
-		printf("Here the n is how many times the process should be executed.\n");
-		printf("The name should be the name of the process and the parameters will used as parameters of called process.\n");
+		printf("Here the n is how many times the process should be executed. The name should be the name of the process and the parameters will used as parameters of called process.\n");
 	}
 	else if (strcmp(input, "help exit") == 0)
 	{
@@ -233,16 +236,36 @@ void printHelp(char *input)
  * of tokenized elements. If the number doesnt match the length, than there is
  * less token than the given arrays size.
  */
-int tokenizeInput(char *input, char **tokens, int length)
+int tokenizeInput(char *input, char **tokens)
 {
 	int counter = 0;
 	char *temp = strtok(input, " ");
 
-	while (temp != NULL && counter < length)
+	while (temp != NULL)
 	{
 		tokens[counter++] = temp;
 		temp = strtok(NULL, " ");
 	}
 
 	return counter;
+}
+
+/* Copies arr2's elements to arr1. Limit is given because arr2 might be bigger
+ *than arr1. In that case function will loop 'limit' times
+ */
+void copyMatrixUntil(int limit, char **arr1, char **arr2)
+{
+	for (int i = 0; i < limit; i++)
+	{
+		arr1[i] = arr2[i];
+	}
+}
+
+// Prints given string arr
+void printStrArr(int n, char **matrix)
+{
+    for (int i = 0; i < n; i++)
+    {
+        printf("%s\n", matrix[i]);
+    }
 }
